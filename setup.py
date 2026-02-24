@@ -2,14 +2,13 @@ import platform
 import sys
 from pathlib import Path
 
-import pkg_resources
 from setuptools import find_packages, setup
 
 
 def read_version(fname="moonshine/version.py"):
-    exec(compile(open(fname, encoding="utf-8").read(), fname, "exec"))
-    return locals()["__version__"]
-
+    ns = {}
+    exec(compile(open(fname, encoding="utf-8").read(), fname, "exec"), ns)
+    return ns["__version__"]
 
 setup(
     name="useful-moonshine",
@@ -25,10 +24,9 @@ setup(
     license="MIT",
     packages=find_packages(exclude=["tests*"]),
     install_requires=[
-        str(r)
-        for r in pkg_resources.parse_requirements(
-            Path(__file__).with_name("requirements.txt").open()
-        )
+        line.strip()
+        for line in Path(__file__).with_name("requirements.txt").open()
+        if line.strip() and not line.startswith("#")
     ],
     extras_require={
         "tensorflow": ["tensorflow==2.17.0"],
